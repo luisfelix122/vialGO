@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stub theme: full Compose setup replaces this in PR-3 -->
+    <style name="Theme.VialGo" parent="android:Theme.NoTitleBar" />
+</resources>

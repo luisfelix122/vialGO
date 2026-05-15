@@ -1,0 +1,24 @@
+# ============================================================
+# local.properties.example — copy to local.properties and fill in values
+# NEVER commit local.properties to version control
+# ============================================================
+
+# Android SDK path (set automatically by Android Studio)
+sdk.dir=/path/to/your/Android/Sdk
+
+# --- Supabase ---
+# Found at: Supabase Dashboard > Project Settings > API
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+
+# --- Release signing (optional for debug builds) ---
+# VIALGO_KEYSTORE_PATH=/absolute/path/to/vialgo-release.jks
+# VIALGO_KEYSTORE_PASSWORD=your-keystore-password
+# VIALGO_KEY_ALIAS=your-key-alias
+# VIALGO_KEY_PASSWORD=your-key-password
+
+# Alternatively, set these as environment variables in CI:
+#   export VIALGO_KEYSTORE_PATH=...
+#   export VIALGO_KEYSTORE_PASSWORD=...
+#   export VIALGO_KEY_ALIAS=...
+#   export VIALGO_KEY_PASSWORD=...

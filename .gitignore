@@ -1,0 +1,77 @@
+# ============================================================
+# VialGo — Android / KMP .gitignore
+# ============================================================
+
+# Secrets & local config
+local.properties
+*.jks
+*.keystore
+google-services.json
+
+# Gradle
+.gradle/
+**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+*.class
+
+# Compose compiler metrics (optional — remove to commit)
+**/compose_compiler/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Linux
+*~
+
+# Navigation Safe Args generated
+**/generated/
+
+# Build outputs
+out/
+release/
+
+# Keystore files (double coverage)
+*.keystore
+*.jks
+
+# Local test coverage reports
+*/reports/
+
+# Gradle wrapper can be committed, but not the dist cache
+.gradle/wrapper/dists/
+
+# Supabase local config (secrets)
+supabase/.env
+supabase/.temp/
+
+# Firebase service account keys
+**/service-account*.json
+firebase-debug.log
+
+# OpenSpec local artifacts
+openspec/
+
+# Claude Code session data
+.claude/
+
+.kotlin/
+.atl/
+MEJORAS_FUTURAS.md
