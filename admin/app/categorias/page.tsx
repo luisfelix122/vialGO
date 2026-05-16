@@ -63,7 +63,7 @@ export default function CategoriasPage() {
     setSaving(true)
     const payload = {
       nombre: form.nombre.trim(),
-      descripcion: form.descripcion?.trim() || '',
+      descripcion: form.descripcion?.trim() || null,
       rol: form.rol,
     }
 

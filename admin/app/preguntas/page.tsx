@@ -523,7 +523,6 @@ export default function PreguntasPage() {
                   >
                     <option value="imagen">Imagen</option>
                     <option value="video">Video (YouTube)</option>
-                    <option value="texto">Texto</option>
                   </select>
                 </div>
                 <div>

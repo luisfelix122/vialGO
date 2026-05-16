@@ -68,7 +68,7 @@ export default function ModulosPage() {
     const payload = {
       rol: form.rol,
       nombre: form.nombre.trim(),
-      descripcion: form.descripcion?.trim() || '',
+      descripcion: form.descripcion?.trim() || null,
       orden: form.orden,
       esta_activo: form.esta_activo,
     }

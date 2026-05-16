@@ -9,7 +9,7 @@ export interface Modulo {
   id: string
   rol: string
   nombre: string
-  descripcion: string
+  descripcion: string | null
   orden: number
   esta_activo: boolean
 }
@@ -18,7 +18,7 @@ export interface Leccion {
   id: string
   modulo_id: string
   nombre: string
-  descripcion: string
+  descripcion: string | null
   orden: number
   esta_activa: boolean
 }
@@ -27,7 +27,7 @@ export interface CategoriaPregunta {
   id: string
   nombre: string
   rol: string
-  descripcion: string
+  descripcion: string | null
 }
 
 export interface Pregunta {

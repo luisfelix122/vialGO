@@ -78,7 +78,7 @@ export default function LeccionesPage() {
     const payload = {
       modulo_id: form.modulo_id,
       nombre: form.nombre.trim(),
-      descripcion: form.descripcion?.trim() || '',
+      descripcion: form.descripcion?.trim() || null,
       orden: form.orden,
       esta_activa: form.esta_activa,
     }
