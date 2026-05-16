@@ -69,6 +69,7 @@ class FakeRepositorioContenido : RepositorioContenido {
 
     var llamadasObtenerModulos = 0
     var llamadasObtenerPreguntas = 0
+    var llamadasObtenerProgreso = 0
 
     override suspend fun obtenerModulos(rol: RolUsuario): Resultado<List<Modulo>> {
         llamadasObtenerModulos++
@@ -89,8 +90,10 @@ class FakeRepositorioContenido : RepositorioContenido {
     override suspend fun obtenerPreguntasPorCategoria(categoria: String): Resultado<List<Pregunta>> =
         resultadoObtenerPreguntas
 
-    override suspend fun obtenerProgreso(usuarioId: String, rolId: String): Resultado<List<ProgresoLeccion>> =
-        resultadoObtenerProgreso
+    override suspend fun obtenerProgreso(usuarioId: String, rolId: String): Resultado<List<ProgresoLeccion>> {
+        llamadasObtenerProgreso++
+        return resultadoObtenerProgreso
+    }
 }
 
 // ---- Fake RepositorioGamificacion ----
@@ -100,10 +103,13 @@ class FakeRepositorioGamificacion : RepositorioGamificacion {
     var resultadoObtenerVidas: Resultado<Vida> = Resultado.Exito(vidaPrueba())
     var resultadoConsumirVida: Resultado<Vida> = Resultado.Exito(vidaPrueba(cantidad = 4))
 
+    var llamadasObtenerVidas = 0
     var llamadasConsumirVida = 0
 
-    override suspend fun obtenerVidas(usuarioId: String): Resultado<Vida> =
-        resultadoObtenerVidas
+    override suspend fun obtenerVidas(usuarioId: String): Resultado<Vida> {
+        llamadasObtenerVidas++
+        return resultadoObtenerVidas
+    }
 
     override suspend fun consumirVida(usuarioId: String): Resultado<Vida> {
         llamadasConsumirVida++
