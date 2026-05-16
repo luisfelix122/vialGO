@@ -10,39 +10,38 @@ import com.vialgo.app.dominio.entidades.Modulo
 import com.vialgo.app.dominio.entidades.OpcionPregunta
 import com.vialgo.app.dominio.entidades.Pregunta
 import com.vialgo.app.dominio.entidades.ProgresoLeccion
-import com.vialgo.app.dominio.entidades.RolUsuario
-import com.vialgo.app.dominio.entidades.TipoPregunta
 import kotlinx.datetime.Instant
 
 fun ModuloDto.aEntidad(lecciones: List<Leccion> = emptyList()): Modulo = Modulo(
     id = id,
-    titulo = titulo,
+    nombre = nombre,
     descripcion = descripcion,
     orden = orden,
-    urlImagenPortada = urlImagenPortada,
-    rolesDisponibles = rolesDisponibles.map { rolStringAEntidad(it) },
+    rol = rol,
+    estaActivo = estaActivo,
     lecciones = lecciones,
 )
 
 fun LeccionDto.aEntidad(): Leccion = Leccion(
     id = id,
     moduloId = moduloId,
-    titulo = titulo,
+    nombre = nombre,
     descripcion = descripcion,
     orden = orden,
-    puntajeMaximo = puntajeMaximo,
-    tiempoLimiteSegundos = tiempoLimiteSegundos,
-    urlImagenPortada = urlImagenPortada,
+    estaActiva = estaActiva,
 )
 
 fun PreguntaDto.aEntidad(opciones: List<OpcionPregunta> = emptyList()): Pregunta = Pregunta(
     id = id,
+    categoriaId = categoriaId,
     leccionId = leccionId,
     enunciado = enunciado,
-    tipo = TipoPregunta.valueOf(tipo.uppercase()),
-    urlImagen = urlImagen,
-    urlVideo = urlVideo,
-    orden = orden,
+    tipoMedio = tipoMedio,
+    urlMedio = urlMedio,
+    duracionMedioSeg = duracionMedioSeg,
+    textoConsecuencia = textoConsecuencia,
+    esClasificacion = esClasificacion,
+    estaActiva = estaActiva,
     opciones = opciones,
 )
 

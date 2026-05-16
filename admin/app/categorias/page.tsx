@@ -1,22 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase, type Categoria } from '@/lib/supabase'
+import { supabase, type CategoriaPregunta } from '@/lib/supabase'
 
-const emptyForm: Omit<Categoria, 'id'> = {
+const emptyForm: Omit<CategoriaPregunta, 'id'> = {
   nombre: '',
   descripcion: '',
-  orden: null,
-  rol: null,
+  rol: 'conductor',
 }
 
 export default function CategoriasPage() {
-  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [categorias, setCategorias] = useState<CategoriaPregunta[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [editing, setEditing] = useState<Categoria | null>(null)
-  const [form, setForm] = useState<Omit<Categoria, 'id'>>(emptyForm)
+  const [editing, setEditing] = useState<CategoriaPregunta | null>(null)
+  const [form, setForm] = useState<Omit<CategoriaPregunta, 'id'>>(emptyForm)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
@@ -28,9 +27,9 @@ export default function CategoriasPage() {
   async function fetchCategorias() {
     setLoading(true)
     const { data, error } = await supabase
-      .from('categorias')
+      .from('categorias_pregunta')
       .select('*')
-      .order('orden', { ascending: true })
+      .order('nombre', { ascending: true })
     if (error) showToast('error', error.message)
     else setCategorias(data ?? [])
     setLoading(false)
@@ -46,12 +45,11 @@ export default function CategoriasPage() {
     setShowModal(true)
   }
 
-  function openEdit(cat: Categoria) {
+  function openEdit(cat: CategoriaPregunta) {
     setEditing(cat)
     setForm({
       nombre: cat.nombre,
       descripcion: cat.descripcion ?? '',
-      orden: cat.orden,
       rol: cat.rol,
     })
     setShowModal(true)
@@ -65,14 +63,13 @@ export default function CategoriasPage() {
     setSaving(true)
     const payload = {
       nombre: form.nombre.trim(),
-      descripcion: form.descripcion?.trim() || null,
-      orden: form.orden,
-      rol: form.rol || null,
+      descripcion: form.descripcion?.trim() || '',
+      rol: form.rol,
     }
 
     if (editing) {
       const { error } = await supabase
-        .from('categorias')
+        .from('categorias_pregunta')
         .update(payload)
         .eq('id', editing.id)
       if (error) showToast('error', error.message)
@@ -82,7 +79,7 @@ export default function CategoriasPage() {
         fetchCategorias()
       }
     } else {
-      const { error } = await supabase.from('categorias').insert(payload)
+      const { error } = await supabase.from('categorias_pregunta').insert(payload)
       if (error) showToast('error', error.message)
       else {
         showToast('success', 'Categoría creada')
@@ -94,7 +91,7 @@ export default function CategoriasPage() {
   }
 
   async function handleDelete(id: string) {
-    const { error } = await supabase.from('categorias').delete().eq('id', id)
+    const { error } = await supabase.from('categorias_pregunta').delete().eq('id', id)
     if (error) showToast('error', error.message)
     else {
       showToast('success', 'Categoría eliminada')
@@ -122,7 +119,7 @@ export default function CategoriasPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Categorías</h1>
-          <p className="text-white/50 mt-1">Módulos del contenido educativo</p>
+          <p className="text-white/50 mt-1">Categorías de preguntas por rol</p>
         </div>
         <button
           onClick={openCreate}
@@ -147,7 +144,6 @@ export default function CategoriasPage() {
                 <th className="text-left px-6 py-4 text-white/60 text-sm font-medium">Nombre</th>
                 <th className="text-left px-6 py-4 text-white/60 text-sm font-medium">Descripción</th>
                 <th className="text-left px-6 py-4 text-white/60 text-sm font-medium">Rol</th>
-                <th className="text-left px-6 py-4 text-white/60 text-sm font-medium">Orden</th>
                 <th className="text-right px-6 py-4 text-white/60 text-sm font-medium">Acciones</th>
               </tr>
             </thead>
@@ -166,21 +162,18 @@ export default function CategoriasPage() {
                     {cat.descripcion || '—'}
                   </td>
                   <td className="px-6 py-4">
-                    {cat.rol ? (
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          cat.rol === 'conductor'
-                            ? 'bg-vialgo-green/20 text-vialgo-green-light'
-                            : 'bg-blue-500/20 text-blue-400'
-                        }`}
-                      >
-                        {cat.rol}
-                      </span>
-                    ) : (
-                      <span className="text-white/30 text-sm">—</span>
-                    )}
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                        cat.rol === 'conductor'
+                          ? 'bg-vialgo-green/20 text-vialgo-green-light'
+                          : cat.rol === 'peaton'
+                          ? 'bg-blue-500/20 text-blue-400'
+                          : 'bg-purple-500/20 text-purple-400'
+                      }`}
+                    >
+                      {cat.rol}
+                    </span>
                   </td>
-                  <td className="px-6 py-4 text-white/60 text-sm">{cat.orden ?? '—'}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
@@ -262,40 +255,19 @@ export default function CategoriasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-white/60 mb-1.5">Rol</label>
-                  <select
-                    value={form.rol ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        rol: (e.target.value as 'conductor' | 'peaton') || null,
-                      })
-                    }
-                    className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-vialgo-green text-sm"
-                  >
-                    <option value="">Sin rol</option>
-                    <option value="conductor">Conductor</option>
-                    <option value="peaton">Peatón</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm text-white/60 mb-1.5">Orden</label>
-                  <input
-                    type="number"
-                    value={form.orden ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        orden: e.target.value ? parseInt(e.target.value) : null,
-                      })
-                    }
-                    placeholder="1"
-                    className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-vialgo-green text-sm"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-1.5">
+                  Rol <span className="text-red-400">*</span>
+                </label>
+                <select
+                  value={form.rol}
+                  onChange={(e) => setForm({ ...form, rol: e.target.value })}
+                  className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-vialgo-green text-sm"
+                >
+                  <option value="conductor">Conductor</option>
+                  <option value="peaton">Peatón</option>
+                  <option value="ambos">Ambos</option>
+                </select>
               </div>
             </div>
 

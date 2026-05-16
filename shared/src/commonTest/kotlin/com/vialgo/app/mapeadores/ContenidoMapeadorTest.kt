@@ -11,12 +11,14 @@ class ContenidoMapeadorTest {
 
     private val preguntaDtoBase = PreguntaDto(
         id = "preg-001",
+        categoriaId = "categoria-abc",
         leccionId = "leccion-123",
         enunciado = "¿Cuál es la velocidad máxima en zona urbana?",
-        tipo = "opcion_multiple",
-        urlImagen = null,
-        urlVideo = null,
-        orden = 1,
+        tipoMedio = "video",
+        urlMedio = "https://example.com/video.mp4",
+        textoConsecuencia = "La velocidad máxima en zona urbana es 60 km/h.",
+        esClasificacion = false,
+        estaActiva = true,
     )
 
     private val opcionesDtos = listOf(
@@ -44,7 +46,6 @@ class ContenidoMapeadorTest {
         assertEquals("preg-001", entidad.id)
         assertEquals("leccion-123", entidad.leccionId)
         assertEquals("¿Cuál es la velocidad máxima en zona urbana?", entidad.enunciado)
-        assertEquals(1, entidad.orden)
         assertEquals(2, entidad.opciones.size)
     }
 
@@ -83,12 +84,18 @@ class ContenidoMapeadorTest {
     }
 
     @Test
-    fun `PreguntaDto aEntidad tipo opcion_multiple mapea a TipoPregunta`() {
+    fun `PreguntaDto aEntidad mapea tipoMedio y urlMedio correctamente`() {
         val entidad = preguntaDtoBase.aEntidad()
 
-        assertEquals(
-            com.vialgo.app.dominio.entidades.TipoPregunta.OPCION_MULTIPLE,
-            entidad.tipo,
-        )
+        assertEquals("video", entidad.tipoMedio)
+        assertEquals("https://example.com/video.mp4", entidad.urlMedio)
+    }
+
+    @Test
+    fun `PreguntaDto aEntidad mapea textoConsecuencia y estaActiva`() {
+        val entidad = preguntaDtoBase.aEntidad()
+
+        assertEquals("La velocidad máxima en zona urbana es 60 km/h.", entidad.textoConsecuencia)
+        assertEquals(true, entidad.estaActiva)
     }
 }

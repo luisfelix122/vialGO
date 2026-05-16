@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type Stats = {
+  modulos: number
   categorias: number
   lecciones: number
   preguntas: number
@@ -12,6 +13,7 @@ type Stats = {
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
+    modulos: 0,
     categorias: 0,
     lecciones: 0,
     preguntas: 0,
@@ -23,14 +25,16 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [catRes, lecRes, pregRes, pregActivasRes] = await Promise.all([
-          supabase.from('categorias').select('*', { count: 'exact', head: true }),
+        const [modRes, catRes, lecRes, pregRes, pregActivasRes] = await Promise.all([
+          supabase.from('modulos').select('*', { count: 'exact', head: true }),
+          supabase.from('categorias_pregunta').select('*', { count: 'exact', head: true }),
           supabase.from('lecciones').select('*', { count: 'exact', head: true }),
           supabase.from('preguntas').select('*', { count: 'exact', head: true }),
-          supabase.from('preguntas').select('*', { count: 'exact', head: true }).eq('activa', true),
+          supabase.from('preguntas').select('*', { count: 'exact', head: true }).eq('esta_activa', true),
         ])
 
         setStats({
+          modulos: modRes.count ?? 0,
           categorias: catRes.count ?? 0,
           lecciones: lecRes.count ?? 0,
           preguntas: pregRes.count ?? 0,
@@ -48,6 +52,14 @@ export default function DashboardPage() {
   }, [])
 
   const cards = [
+    {
+      label: 'Módulos',
+      value: stats.modulos,
+      icon: '🗂️',
+      color: 'border-indigo-500',
+      bg: 'bg-indigo-500/10',
+      href: '/modulos',
+    },
     {
       label: 'Categorías',
       value: stats.categorias,
@@ -98,7 +110,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-surface rounded-xl p-6 border border-white/10 animate-pulse">
               <div className="h-4 bg-white/10 rounded mb-4 w-2/3"></div>
@@ -107,7 +119,7 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {cards.map((card) => (
             <a
               key={card.label}

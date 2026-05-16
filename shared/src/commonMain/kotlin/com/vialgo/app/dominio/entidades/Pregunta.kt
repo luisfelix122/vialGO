@@ -2,17 +2,14 @@ package com.vialgo.app.dominio.entidades
 
 data class Pregunta(
     val id: String,
+    val categoriaId: String,
     val leccionId: String?,
     val enunciado: String,
-    val tipo: TipoPregunta,
-    val urlImagen: String?,
-    val urlVideo: String?,
-    val orden: Int,
+    val tipoMedio: String,
+    val urlMedio: String,
+    val duracionMedioSeg: Int?,
+    val textoConsecuencia: String,
+    val esClasificacion: Boolean,
+    val estaActiva: Boolean,
     val opciones: List<OpcionPregunta>,
 )
-
-enum class TipoPregunta {
-    OPCION_MULTIPLE,
-    VERDADERO_FALSO,
-    VIDEO_OPCION,
-}

@@ -12,7 +12,6 @@ import com.vialgo.app.dominio.entidades.ProgresoLeccion
 import com.vialgo.app.dominio.entidades.RespuestaUsuario
 import com.vialgo.app.dominio.entidades.RolUsuario
 import com.vialgo.app.dominio.entidades.Sesion
-import com.vialgo.app.dominio.entidades.TipoPregunta
 import com.vialgo.app.dominio.entidades.Vida
 import com.vialgo.app.dominio.repositorios.RepositorioContenido
 import com.vialgo.app.dominio.repositorios.RepositorioGamificacion
@@ -165,12 +164,15 @@ fun vidaPrueba(cantidad: Int = 5) = Vida(
 fun preguntasPrueba(cantidad: Int = 5): List<Pregunta> = (1..cantidad).map { i ->
     Pregunta(
         id = "pregunta-$i",
+        categoriaId = "categoria-1",
         leccionId = "leccion-1",
         enunciado = "Pregunta $i",
-        tipo = TipoPregunta.OPCION_MULTIPLE,
-        urlImagen = null,
-        urlVideo = null,
-        orden = i,
+        tipoMedio = "video",
+        urlMedio = "https://example.com/video-$i.mp4",
+        duracionMedioSeg = null,
+        textoConsecuencia = "Consecuencia de pregunta $i",
+        esClasificacion = false,
+        estaActiva = true,
         opciones = listOf(
             OpcionPregunta(id = "opcion-correcta-$i", preguntaId = "pregunta-$i", texto = "Correcta", esCorrecta = true, orden = 1),
             OpcionPregunta(id = "opcion-incorrecta-$i", preguntaId = "pregunta-$i", texto = "Incorrecta", esCorrecta = false, orden = 2),

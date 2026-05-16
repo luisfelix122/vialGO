@@ -6,15 +6,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PreguntaDto(
     @SerialName("id") val id: String,
+    @SerialName("categoria_id") val categoriaId: String,
     @SerialName("leccion_id") val leccionId: String? = null,
     @SerialName("enunciado") val enunciado: String,
-    @SerialName("tipo") val tipo: String,
-    @SerialName("url_imagen") val urlImagen: String? = null,
-    @SerialName("url_video") val urlVideo: String? = null,
-    @SerialName("orden") val orden: Int,
-    @SerialName("tipo_medio") val tipoMedio: String? = null,
-    @SerialName("url_medio") val urlMedio: String? = null,
+    @SerialName("tipo_medio") val tipoMedio: String,
+    @SerialName("url_medio") val urlMedio: String,
+    @SerialName("duracion_medio_seg") val duracionMedioSeg: Int? = null,
+    @SerialName("texto_consecuencia") val textoConsecuencia: String,
     @SerialName("es_clasificacion") val esClasificacion: Boolean = false,
+    @SerialName("esta_activa") val estaActiva: Boolean = true,
+    @SerialName("creado_en") val creadoEn: String? = null,
 )
 
 @Serializable

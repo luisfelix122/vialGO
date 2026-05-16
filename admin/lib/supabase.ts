@@ -5,44 +5,53 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-export type Categoria = {
+export interface Modulo {
+  id: string
+  rol: string
+  nombre: string
+  descripcion: string
+  orden: number
+  esta_activo: boolean
+}
+
+export interface Leccion {
+  id: string
+  modulo_id: string
+  nombre: string
+  descripcion: string
+  orden: number
+  esta_activa: boolean
+}
+
+export interface CategoriaPregunta {
   id: string
   nombre: string
-  descripcion: string | null
-  orden: number | null
-  rol: 'conductor' | 'peaton' | null
+  rol: string
+  descripcion: string
 }
 
-export type Leccion = {
+export interface Pregunta {
   id: string
   categoria_id: string
-  titulo: string
-  descripcion: string | null
-  orden: number | null
-  puntaje_maximo: number | null
-  tiempo_limite_seg: number | null
-  url_imagen_portada: string | null
-}
-
-export type Pregunta = {
-  id: string
   leccion_id: string | null
-  categoria_id: string
   enunciado: string
-  tipo_medio: 'video' | 'imagen' | null
-  url_medio: string | null
+  tipo_medio: string
+  url_medio: string
   duracion_medio_seg: number | null
-  texto_consecuencia: string | null
+  texto_consecuencia: string
   es_clasificacion: boolean
-  activa: boolean
-  orden: number | null
+  esta_activa: boolean
+  creado_en: string
 }
 
-export type OpcionPregunta = {
+export interface OpcionPregunta {
   id: string
   pregunta_id: string
   texto: string
+  imagen_url: string | null
   es_correcta: boolean
   orden: number
-  imagen_url: string | null
 }
+
+// Legacy type aliases for backward compat during migration
+export type Categoria = CategoriaPregunta

@@ -1,29 +1,33 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase, type Pregunta, type Categoria, type Leccion, type OpcionPregunta } from '@/lib/supabase'
+import { supabase, type Pregunta, type CategoriaPregunta, type Leccion, type OpcionPregunta } from '@/lib/supabase'
 
 type PreguntaWithOpciones = Pregunta & { opciones: OpcionPregunta[] }
 
-const emptyOpcion = (preguntaId: string, orden: number): Omit<OpcionPregunta, 'id'> => ({
-  pregunta_id: preguntaId,
-  texto: '',
-  es_correcta: orden === 1,
-  orden,
-  imagen_url: null,
-})
+type FormState = {
+  leccion_id: string | null
+  categoria_id: string
+  enunciado: string
+  tipo_medio: string
+  url_medio: string
+  duracion_medio_seg: number | null
+  texto_consecuencia: string
+  es_clasificacion: boolean
+  esta_activa: boolean
+  opciones: { texto: string; es_correcta: boolean; orden: number }[]
+}
 
-const emptyForm: Omit<Pregunta, 'id'> & { opciones: { texto: string; es_correcta: boolean; orden: number }[] } = {
+const emptyForm: FormState = {
   leccion_id: null,
   categoria_id: '',
   enunciado: '',
   tipo_medio: 'imagen',
-  url_medio: null,
+  url_medio: '',
   duracion_medio_seg: null,
-  texto_consecuencia: null,
+  texto_consecuencia: '',
   es_clasificacion: false,
-  activa: true,
-  orden: 0,
+  esta_activa: true,
   opciones: [
     { texto: '', es_correcta: true, orden: 1 },
     { texto: '', es_correcta: false, orden: 2 },
@@ -34,14 +38,14 @@ const emptyForm: Omit<Pregunta, 'id'> & { opciones: { texto: string; es_correcta
 
 export default function PreguntasPage() {
   const [preguntas, setPreguntas] = useState<PreguntaWithOpciones[]>([])
-  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [categorias, setCategorias] = useState<CategoriaPregunta[]>([])
   const [lecciones, setLecciones] = useState<Leccion[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState<PreguntaWithOpciones | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState<FormState>(emptyForm)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
@@ -56,9 +60,9 @@ export default function PreguntasPage() {
       supabase
         .from('preguntas')
         .select('*, opciones_pregunta(*)')
-        .order('orden', { ascending: true }),
-      supabase.from('categorias').select('*').order('nombre'),
-      supabase.from('lecciones').select('*').order('titulo'),
+        .order('creado_en', { ascending: false }),
+      supabase.from('categorias_pregunta').select('*').order('nombre'),
+      supabase.from('lecciones').select('*').order('nombre'),
     ])
 
     if (pregRes.error) showToast('error', pregRes.error.message)
@@ -84,7 +88,7 @@ export default function PreguntasPage() {
 
   function getLeccionName(id: string | null) {
     if (!id) return null
-    return lecciones.find((l) => l.id === id)?.titulo ?? null
+    return lecciones.find((l) => l.id === id)?.nombre ?? null
   }
 
   function openCreate() {
@@ -101,12 +105,11 @@ export default function PreguntasPage() {
       categoria_id: preg.categoria_id,
       enunciado: preg.enunciado,
       tipo_medio: preg.tipo_medio ?? 'imagen',
-      url_medio: preg.url_medio,
+      url_medio: preg.url_medio ?? '',
       duracion_medio_seg: preg.duracion_medio_seg,
-      texto_consecuencia: preg.texto_consecuencia,
+      texto_consecuencia: preg.texto_consecuencia ?? '',
       es_clasificacion: preg.es_clasificacion,
-      activa: preg.activa,
-      orden: preg.orden ?? 0,
+      esta_activa: preg.esta_activa,
       opciones: sortedOpts.length === 4
         ? sortedOpts.map((o) => ({ texto: o.texto, es_correcta: o.es_correcta, orden: o.orden }))
         : [
@@ -142,6 +145,14 @@ export default function PreguntasPage() {
       showToast('error', 'La categoría es requerida')
       return
     }
+    if (!form.url_medio.trim()) {
+      showToast('error', 'La URL del medio es requerida')
+      return
+    }
+    if (!form.texto_consecuencia.trim()) {
+      showToast('error', 'El texto consecuencia es requerido')
+      return
+    }
     const correctCount = form.opciones.filter((o) => o.es_correcta).length
     if (correctCount !== 1) {
       showToast('error', 'Debe haber exactamente 1 opción correcta')
@@ -160,12 +171,11 @@ export default function PreguntasPage() {
       categoria_id: form.categoria_id,
       enunciado: form.enunciado.trim(),
       tipo_medio: form.tipo_medio,
-      url_medio: form.url_medio?.trim() || null,
+      url_medio: form.url_medio.trim(),
       duracion_medio_seg: form.duracion_medio_seg,
-      texto_consecuencia: form.texto_consecuencia?.trim() || null,
+      texto_consecuencia: form.texto_consecuencia.trim(),
       es_clasificacion: form.es_clasificacion,
-      activa: form.activa,
-      orden: form.orden ?? 0,
+      esta_activa: form.esta_activa,
     }
 
     if (editing) {
@@ -243,7 +253,7 @@ export default function PreguntasPage() {
   async function toggleActiva(preg: PreguntaWithOpciones) {
     const { error } = await supabase
       .from('preguntas')
-      .update({ activa: !preg.activa })
+      .update({ esta_activa: !preg.esta_activa })
       .eq('id', preg.id)
     if (error) showToast('error', error.message)
     else fetchAll()
@@ -338,12 +348,12 @@ export default function PreguntasPage() {
                     <button
                       onClick={() => toggleActiva(preg)}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        preg.activa ? 'bg-vialgo-green' : 'bg-white/20'
+                        preg.esta_activa ? 'bg-vialgo-green' : 'bg-white/20'
                       }`}
                     >
                       <span
                         className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                          preg.activa ? 'translate-x-4' : 'translate-x-1'
+                          preg.esta_activa ? 'translate-x-4' : 'translate-x-1'
                         }`}
                       />
                     </button>
@@ -493,7 +503,7 @@ export default function PreguntasPage() {
                     <option value="">Sin lección</option>
                     {lecciones.map((lec) => (
                       <option key={lec.id} value={lec.id}>
-                        {lec.titulo}
+                        {lec.nombre}
                       </option>
                     ))}
                   </select>
@@ -503,29 +513,27 @@ export default function PreguntasPage() {
               {/* Tipo medio + URL */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-white/60 mb-1.5">Tipo de medio</label>
+                  <label className="block text-sm text-white/60 mb-1.5">
+                    Tipo de medio <span className="text-red-400">*</span>
+                  </label>
                   <select
-                    value={form.tipo_medio ?? 'imagen'}
-                    onChange={(e) =>
-                      setForm({ ...form, tipo_medio: e.target.value as 'video' | 'imagen' })
-                    }
+                    value={form.tipo_medio}
+                    onChange={(e) => setForm({ ...form, tipo_medio: e.target.value })}
                     className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-vialgo-green text-sm"
                   >
                     <option value="imagen">Imagen</option>
                     <option value="video">Video (YouTube)</option>
+                    <option value="texto">Texto</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm text-white/60 mb-1.5">
-                    URL del medio{' '}
-                    <span className="text-white/30 text-xs">(opcional)</span>
+                    URL del medio <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="url"
-                    value={form.url_medio ?? ''}
-                    onChange={(e) =>
-                      setForm({ ...form, url_medio: e.target.value || null })
-                    }
+                    value={form.url_medio}
+                    onChange={(e) => setForm({ ...form, url_medio: e.target.value })}
                     placeholder={
                       form.tipo_medio === 'video'
                         ? 'https://www.youtube.com/watch?v=...'
@@ -536,17 +544,36 @@ export default function PreguntasPage() {
                 </div>
               </div>
 
+              {/* Duracion medio (optional) */}
+              <div>
+                <label className="block text-sm text-white/60 mb-1.5">
+                  Duración del medio (seg){' '}
+                  <span className="text-white/30 text-xs">(opcional)</span>
+                </label>
+                <input
+                  type="number"
+                  value={form.duracion_medio_seg ?? ''}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      duracion_medio_seg: e.target.value ? parseInt(e.target.value) : null,
+                    })
+                  }
+                  placeholder="30"
+                  min="0"
+                  className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-vialgo-green text-sm"
+                />
+              </div>
+
               {/* Texto consecuencia */}
               <div>
                 <label className="block text-sm text-white/60 mb-1.5">
-                  Texto Consecuencia{' '}
+                  Texto Consecuencia <span className="text-red-400">*</span>{' '}
                   <span className="text-white/30 text-xs">(explicación tras responder)</span>
                 </label>
                 <textarea
-                  value={form.texto_consecuencia ?? ''}
-                  onChange={(e) =>
-                    setForm({ ...form, texto_consecuencia: e.target.value || null })
-                  }
+                  value={form.texto_consecuencia}
+                  onChange={(e) => setForm({ ...form, texto_consecuencia: e.target.value })}
                   placeholder="Explicación educativa que se muestra después de responder..."
                   rows={3}
                   className="w-full bg-background border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-vialgo-green text-sm resize-none"
@@ -567,8 +594,8 @@ export default function PreguntasPage() {
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={form.activa}
-                    onChange={(e) => setForm({ ...form, activa: e.target.checked })}
+                    checked={form.esta_activa}
+                    onChange={(e) => setForm({ ...form, esta_activa: e.target.checked })}
                     className="w-4 h-4 rounded accent-vialgo-green"
                   />
                   <span className="text-sm text-white/70">Activa</span>

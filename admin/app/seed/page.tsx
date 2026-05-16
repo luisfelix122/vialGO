@@ -10,11 +10,12 @@ type SeedStep = {
 }
 
 const YT_PLACEHOLDER = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+const IMG_PLACEHOLDER = 'https://placehold.co/600x400/1a1a2e/4ade80?text=VialGo'
 
 const SEED_QUESTIONS = [
   {
     enunciado: '¿Qué indica una señal de PARE?',
-    tipo_medio: 'video' as const,
+    tipo_medio: 'video',
     url_medio: YT_PLACEHOLDER,
     texto_consecuencia:
       'La señal de PARE indica que el conductor debe detenerse completamente antes de continuar.',
@@ -27,7 +28,7 @@ const SEED_QUESTIONS = [
   },
   {
     enunciado: '¿Qué significa una luz amarilla en el semáforo?',
-    tipo_medio: 'video' as const,
+    tipo_medio: 'video',
     url_medio: YT_PLACEHOLDER,
     texto_consecuencia:
       'La luz amarilla indica precaución. Debes detenerte si puedes hacerlo de manera segura.',
@@ -40,8 +41,8 @@ const SEED_QUESTIONS = [
   },
   {
     enunciado: '¿Cuál es la velocidad máxima permitida en zona escolar en Perú?',
-    tipo_medio: 'imagen' as const,
-    url_medio: null,
+    tipo_medio: 'imagen',
+    url_medio: IMG_PLACEHOLDER,
     texto_consecuencia:
       'En zonas escolares de Perú, la velocidad máxima es de 30 km/h según el Reglamento Nacional de Tránsito.',
     opciones: [
@@ -53,7 +54,7 @@ const SEED_QUESTIONS = [
   },
   {
     enunciado: '¿Qué debe hacer un conductor al acercarse a un cruce peatonal?',
-    tipo_medio: 'video' as const,
+    tipo_medio: 'video',
     url_medio: YT_PLACEHOLDER,
     texto_consecuencia:
       'Los conductores deben reducir la velocidad y ceder el paso a los peatones en los cruces señalizados.',
@@ -66,8 +67,8 @@ const SEED_QUESTIONS = [
   },
   {
     enunciado: '¿Cuándo se debe usar el cinturón de seguridad?',
-    tipo_medio: 'imagen' as const,
-    url_medio: null,
+    tipo_medio: 'imagen',
+    url_medio: IMG_PLACEHOLDER,
     texto_consecuencia:
       'El cinturón de seguridad es obligatorio en todo momento para el conductor y todos los pasajeros.',
     opciones: [
@@ -81,6 +82,7 @@ const SEED_QUESTIONS = [
 
 export default function SeedPage() {
   const [steps, setSteps] = useState<SeedStep[]>([
+    { label: 'Crear módulo "Educación Vial Básica"', status: 'pending' },
     { label: 'Crear categoría "Señales de Tránsito"', status: 'pending' },
     { label: 'Crear lección "Señales Básicas"', status: 'pending' },
     { label: 'Insertar 5 preguntas con opciones', status: 'pending' },
@@ -93,62 +95,87 @@ export default function SeedPage() {
     setSteps((prev) => prev.map((s, i) => (i === idx ? { ...s, ...update } : s)))
   }
 
+  function resetSteps() {
+    return [
+      { label: 'Crear módulo "Educación Vial Básica"', status: 'pending' as const },
+      { label: 'Crear categoría "Señales de Tránsito"', status: 'pending' as const },
+      { label: 'Crear lección "Señales Básicas"', status: 'pending' as const },
+      { label: 'Insertar 5 preguntas con opciones', status: 'pending' as const },
+    ]
+  }
+
   async function runSeed() {
     setRunning(true)
     setDone(false)
     setGlobalError(null)
-    setSteps([
-      { label: 'Crear categoría "Señales de Tránsito"', status: 'pending' },
-      { label: 'Crear lección "Señales Básicas"', status: 'pending' },
-      { label: 'Insertar 5 preguntas con opciones', status: 'pending' },
-    ])
+    setSteps(resetSteps())
 
-    // Step 1: Categoria
+    // Step 0: Modulo
     updateStep(0, { status: 'running' })
-    const { data: catData, error: catError } = await supabase
-      .from('categorias')
+    const { data: modData, error: modError } = await supabase
+      .from('modulos')
       .insert({
-        nombre: 'Señales de Tránsito',
-        descripcion: 'Aprende sobre las señales de tránsito más importantes',
+        nombre: 'Educación Vial Básica',
+        descripcion: 'Módulo introductorio de educación vial para conductores',
         rol: 'conductor',
         orden: 1,
+        esta_activo: true,
+      })
+      .select()
+      .single()
+
+    if (modError) {
+      updateStep(0, { status: 'error', detail: modError.message })
+      setGlobalError(modError.message)
+      setRunning(false)
+      return
+    }
+    updateStep(0, { status: 'done', detail: `ID: ${modData.id.slice(0, 8)}...` })
+
+    // Step 1: Categoria
+    updateStep(1, { status: 'running' })
+    const { data: catData, error: catError } = await supabase
+      .from('categorias_pregunta')
+      .insert({
+        nombre: 'Señales de Tránsito',
+        descripcion: 'Preguntas sobre señales de tránsito y semáforos',
+        rol: 'conductor',
       })
       .select()
       .single()
 
     if (catError) {
-      updateStep(0, { status: 'error', detail: catError.message })
+      updateStep(1, { status: 'error', detail: catError.message })
       setGlobalError(catError.message)
       setRunning(false)
       return
     }
-    updateStep(0, { status: 'done', detail: `ID: ${catData.id.slice(0, 8)}...` })
+    updateStep(1, { status: 'done', detail: `ID: ${catData.id.slice(0, 8)}...` })
 
-    // Step 2: Leccion
-    updateStep(1, { status: 'running' })
+    // Step 2: Leccion (linked to modulo)
+    updateStep(2, { status: 'running' })
     const { data: lecData, error: lecError } = await supabase
       .from('lecciones')
       .insert({
-        categoria_id: catData.id,
-        titulo: 'Señales Básicas',
+        modulo_id: modData.id,
+        nombre: 'Señales Básicas',
         descripcion: 'Conoce las señales de tránsito fundamentales',
         orden: 1,
-        puntaje_maximo: 100,
-        tiempo_limite_seg: 30,
+        esta_activa: true,
       })
       .select()
       .single()
 
     if (lecError) {
-      updateStep(1, { status: 'error', detail: lecError.message })
+      updateStep(2, { status: 'error', detail: lecError.message })
       setGlobalError(lecError.message)
       setRunning(false)
       return
     }
-    updateStep(1, { status: 'done', detail: `ID: ${lecData.id.slice(0, 8)}...` })
+    updateStep(2, { status: 'done', detail: `ID: ${lecData.id.slice(0, 8)}...` })
 
-    // Step 3: Preguntas
-    updateStep(2, { status: 'running' })
+    // Step 3: Preguntas + Opciones
+    updateStep(3, { status: 'running' })
     let inserted = 0
     for (const q of SEED_QUESTIONS) {
       const { data: pregData, error: pregError } = await supabase
@@ -161,14 +188,13 @@ export default function SeedPage() {
           url_medio: q.url_medio,
           texto_consecuencia: q.texto_consecuencia,
           es_clasificacion: false,
-          activa: true,
-          orden: inserted,
+          esta_activa: true,
         })
         .select()
         .single()
 
       if (pregError) {
-        updateStep(2, { status: 'error', detail: pregError.message })
+        updateStep(3, { status: 'error', detail: `Pregunta ${inserted + 1}: ${pregError.message}` })
         setGlobalError(pregError.message)
         setRunning(false)
         return
@@ -185,17 +211,17 @@ export default function SeedPage() {
       )
 
       if (optError) {
-        updateStep(2, { status: 'error', detail: optError.message })
+        updateStep(3, { status: 'error', detail: `Opciones pregunta ${inserted + 1}: ${optError.message}` })
         setGlobalError(optError.message)
         setRunning(false)
         return
       }
 
       inserted++
-      updateStep(2, { status: 'running', detail: `${inserted}/5 preguntas...` })
+      updateStep(3, { status: 'running', detail: `${inserted}/5 preguntas...` })
     }
 
-    updateStep(2, { status: 'done', detail: '5 preguntas + 20 opciones insertadas' })
+    updateStep(3, { status: 'done', detail: '5 preguntas + 20 opciones insertadas' })
     setDone(true)
     setRunning(false)
   }
@@ -224,8 +250,9 @@ export default function SeedPage() {
           <div>
             <p className="text-white font-medium mb-2">¿Qué se va a insertar?</p>
             <ul className="text-white/60 text-sm space-y-1 list-disc list-inside">
+              <li>1 módulo: &quot;Educación Vial Básica&quot; (rol: conductor)</li>
               <li>1 categoría: &quot;Señales de Tránsito&quot; (rol: conductor)</li>
-              <li>1 lección: &quot;Señales Básicas&quot; vinculada a la categoría</li>
+              <li>1 lección: &quot;Señales Básicas&quot; vinculada al módulo</li>
               <li>5 preguntas con links de YouTube de prueba</li>
               <li>20 opciones de respuesta (4 por pregunta)</li>
             </ul>
@@ -305,11 +332,7 @@ export default function SeedPage() {
               onClick={() => {
                 setDone(false)
                 setGlobalError(null)
-                setSteps([
-                  { label: 'Crear categoría "Señales de Tránsito"', status: 'pending' },
-                  { label: 'Crear lección "Señales Básicas"', status: 'pending' },
-                  { label: 'Insertar 5 preguntas con opciones', status: 'pending' },
-                ])
+                setSteps(resetSteps())
               }}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-colors"
             >
@@ -325,11 +348,7 @@ export default function SeedPage() {
           <button
             onClick={() => {
               setGlobalError(null)
-              setSteps([
-                { label: 'Crear categoría "Señales de Tránsito"', status: 'pending' },
-                { label: 'Crear lección "Señales Básicas"', status: 'pending' },
-                { label: 'Insertar 5 preguntas con opciones', status: 'pending' },
-              ])
+              setSteps(resetSteps())
             }}
             className="mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm"
           >

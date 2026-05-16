@@ -28,7 +28,7 @@ class RepositorioContenidoImpl(
             RolUsuario.INVITADO -> "invitado"
         }
         val modulosResultado = cliente.postgrest.from("modulos").select {
-            filter { contains("roles_disponibles", listOf(rolStr)) }
+            filter { eq("rol", rolStr) }
         }
         val modulosDtos = modulosResultado.decodeList<ModuloDto>()
 
@@ -92,7 +92,7 @@ class RepositorioContenidoImpl(
     override suspend fun obtenerPreguntasPorCategoria(categoria: String): Resultado<List<Pregunta>> = try {
         val preguntasResultado = cliente.postgrest.from("preguntas").select {
             filter {
-                eq("categoria", categoria)
+                eq("categoria_id", categoria)
                 eq("es_clasificacion", true)
             }
         }
