@@ -106,11 +106,21 @@ fun PantallaInvitado(navController: NavController) {
 
                     if (datos.errorGeneral != null) {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = datos.errorGeneral,
-                            color = Rojo,
-                            fontSize = 14.sp,
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = Rojo.copy(alpha = 0.12f),
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                                )
+                                .padding(14.dp),
+                        ) {
+                            Text(
+                                text = datos.errorGeneral,
+                                color = Rojo,
+                                fontSize = 14.sp,
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(40.dp))

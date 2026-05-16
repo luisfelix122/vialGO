@@ -36,11 +36,11 @@ class AprenderViewModelTest {
         val modulos = listOf(
             Modulo(
                 id = "modulo-1",
-                titulo = "Señales de transito",
+                nombre = "Señales de transito",
                 descripcion = "Aprende las señales",
                 orden = 1,
-                urlImagenPortada = null,
-                rolesDisponibles = listOf(RolUsuario.CONDUCTOR),
+                rol = "conductor",
+                estaActivo = true,
                 lecciones = emptyList(),
             )
         )
@@ -54,7 +54,7 @@ class AprenderViewModelTest {
         val estado = vm.estadoUi.value
         assertIs<EstadoUi.Contenido<EstadoAprender>>(estado)
         assertEquals(1, estado.datos.modulos.size)
-        assertEquals("Señales de transito", estado.datos.modulos[0].titulo)
+        assertEquals("Señales de transito", estado.datos.modulos[0].nombre)
     }
 
     @Test

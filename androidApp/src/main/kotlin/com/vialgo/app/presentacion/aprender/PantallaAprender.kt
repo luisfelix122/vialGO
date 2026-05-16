@@ -209,7 +209,7 @@ private fun TarjetaModulo(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = modulo.titulo,
+                        text = modulo.nombre,
                         color = TextoPrimario,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -266,7 +266,7 @@ private fun ItemLeccion(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = leccion.titulo,
+            text = leccion.nombre,
             color = TextoPrimario,
             fontSize = 14.sp,
             modifier = Modifier.weight(1f),

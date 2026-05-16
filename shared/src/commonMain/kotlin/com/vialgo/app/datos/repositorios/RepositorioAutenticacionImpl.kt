@@ -1,9 +1,11 @@
 package com.vialgo.app.datos.repositorios
 
 import com.vialgo.app.datos.dtos.AuthResponseDto
+import com.vialgo.app.datos.dtos.ErrorResponseDto
 import com.vialgo.app.datos.dtos.LoginRequestDto
 import com.vialgo.app.datos.dtos.RecuperacionRequestDto
 import com.vialgo.app.datos.dtos.RegistroRequestDto
+import com.vialgo.app.datos.mapeadores.ErrorMapeador
 import com.vialgo.app.datos.mapeadores.aEntidad
 import com.vialgo.app.dominio.comun.Resultado
 import com.vialgo.app.dominio.entidades.RolUsuario
@@ -23,18 +25,29 @@ class RepositorioAutenticacionImpl(
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    private fun extraerError(cuerpo: String): String = try {
+        json.decodeFromString<ErrorResponseDto>(cuerpo).error
+    } catch (_: Exception) {
+        cuerpo
+    }
+
     override suspend fun iniciarSesion(dni: String, contrasena: String): Resultado<Usuario> =
         try {
             val respuesta = cliente.functions.invoke(
                 function = "auth-login",
                 body = LoginRequestDto(dni = dni, password = contrasena),
             )
-            val authResponse = json.decodeFromString<AuthResponseDto>(respuesta.body<String>())
+            val cuerpo = respuesta.body<String>()
+            if (cuerpo.contains("\"error\"")) {
+                val errorMsg = extraerError(cuerpo)
+                return Resultado.Error(ErrorMapeador.traducir(errorMsg))
+            }
+            val authResponse = json.decodeFromString<AuthResponseDto>(cuerpo)
             val usuario = authResponse.data?.user?.aEntidad()
                 ?: return Resultado.Error("Respuesta de servidor inválida")
             Resultado.Exito(usuario)
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al iniciar sesión", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 
     override suspend fun registrar(
@@ -59,12 +72,17 @@ class RepositorioAutenticacionImpl(
                     compromisoMinutos = compromisoMinutos,
                 ),
             )
-            val authResponse = json.decodeFromString<AuthResponseDto>(respuesta.body<String>())
+            val cuerpoReg = respuesta.body<String>()
+            if (cuerpoReg.contains("\"error\"")) {
+                val errorMsg = extraerError(cuerpoReg)
+                return Resultado.Error(ErrorMapeador.traducir(errorMsg))
+            }
+            val authResponse = json.decodeFromString<AuthResponseDto>(cuerpoReg)
             val usuario = authResponse.data?.user?.aEntidad()
                 ?: return Resultado.Error("Respuesta de servidor inválida")
             Resultado.Exito(usuario)
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al registrar usuario", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 
     override suspend fun recuperarContrasena(
@@ -73,7 +91,7 @@ class RepositorioAutenticacionImpl(
         nuevaContrasena: String,
     ): Resultado<Unit> =
         try {
-            cliente.functions.invoke(
+            val respuesta = cliente.functions.invoke(
                 function = "auth-recover",
                 body = RecuperacionRequestDto(
                     dni = dni,
@@ -81,9 +99,14 @@ class RepositorioAutenticacionImpl(
                     nuevaPassword = nuevaContrasena,
                 ),
             )
-            Resultado.Exito(Unit)
+            val cuerpo = respuesta.body<String>()
+            if (cuerpo.contains("\"error\"")) {
+                Resultado.Error(ErrorMapeador.traducir(extraerError(cuerpo)))
+            } else {
+                Resultado.Exito(Unit)
+            }
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al recuperar contraseña", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 
     override suspend fun continuarComoInvitado(): Resultado<Usuario> =
@@ -110,7 +133,7 @@ class RepositorioAutenticacionImpl(
             )
             Resultado.Exito(usuarioInvitado)
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al iniciar sesión como invitado", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 
     override suspend fun cerrarSesion(): Resultado<Unit> =
@@ -118,7 +141,7 @@ class RepositorioAutenticacionImpl(
             cliente.auth.signOut()
             Resultado.Exito(Unit)
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al cerrar sesión", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 
     override suspend fun obtenerUsuarioActual(): Resultado<Usuario?> =
@@ -148,6 +171,6 @@ class RepositorioAutenticacionImpl(
                 }
             }
         } catch (e: Exception) {
-            Resultado.Error(e.message ?: "Error al obtener usuario actual", e)
+            Resultado.Error(ErrorMapeador.traducir(e.message), e)
         }
 }

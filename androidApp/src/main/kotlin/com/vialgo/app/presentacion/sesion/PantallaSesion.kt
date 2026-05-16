@@ -220,18 +220,10 @@ private fun ContenidoSesion(
                     fontWeight = FontWeight.Medium,
                     lineHeight = 22.sp,
                 )
-                if (preguntaActual.urlImagen != null) {
+                if (preguntaActual.urlMedio.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "[Imagen disponible]",
-                        color = TextoSecundario,
-                        fontSize = 12.sp,
-                    )
-                }
-                if (preguntaActual.urlVideo != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "[Video disponible]",
+                        text = if (preguntaActual.tipoMedio == "video") "[Video disponible]" else "[Imagen disponible]",
                         color = TextoSecundario,
                         fontSize = 12.sp,
                     )

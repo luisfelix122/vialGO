@@ -8,6 +8,7 @@ import com.vialgo.app.dominio.comun.ViewModelBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -57,12 +58,13 @@ class RecuperacionViewModel(
 
             when (resultado) {
                 is Resultado.Exito -> {
-                    mostrarContenido(estadoActual.copy(exito = true))
+                    mostrarContenido(estadoActual.copy(exito = true, errorGeneral = null))
+                    delay(2500)
                     _eventos.emit(EventoNavegacion.Volver)
                 }
                 is Resultado.Error -> {
                     mostrarContenido(
-                        estadoActual.copy(errorGeneral = resultado.mensaje)
+                        estadoActual.copy(errorGeneral = resultado.mensaje, exito = false)
                     )
                 }
                 is Resultado.Cargando -> Unit

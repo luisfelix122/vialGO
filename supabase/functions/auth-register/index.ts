@@ -61,8 +61,8 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "rol_activo must be conductor or peaton", code: "INVALID_ROL" }, 400);
   }
   const compromisoNum = Number(compromiso_minutos);
-  if (!compromisoNum || ![2, 3, 5].includes(compromisoNum)) {
-    return jsonResponse({ error: "compromiso_minutos must be 2, 3, or 5", code: "INVALID_COMPROMISO" }, 400);
+  if (!compromisoNum || ![5, 10, 15, 20, 30].includes(compromisoNum)) {
+    return jsonResponse({ error: "compromiso_minutos must be 5, 10, 15, 20, or 30", code: "INVALID_COMPROMISO" }, 400);
   }
 
   const supabase = createClient(

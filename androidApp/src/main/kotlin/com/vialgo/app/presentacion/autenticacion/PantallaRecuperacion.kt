@@ -4,14 +4,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -41,6 +44,7 @@ import androidx.navigation.NavController
 import com.vialgo.app.dominio.comun.EstadoUi
 import com.vialgo.app.presentacion.tema.FondoOscuro
 import com.vialgo.app.presentacion.tema.Rojo
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.vialgo.app.presentacion.tema.TextoPrimario
 import com.vialgo.app.presentacion.tema.TextoSecundario
 import com.vialgo.app.presentacion.tema.VerdePrimario
@@ -120,13 +124,38 @@ fun PantallaRecuperacion(navController: NavController) {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     if (datos.exito) {
-                        Text(
-                            text = "¡Contraseña actualizada con éxito!",
-                            color = VerdeClaro,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = VerdePrimario.copy(alpha = 0.15f),
+                                    shape = RoundedCornerShape(12.dp),
+                                )
+                                .padding(16.dp),
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.CheckCircle,
+                                    contentDescription = null,
+                                    tint = VerdeClaro,
+                                    modifier = Modifier.size(28.dp),
+                                )
+                                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                                Column {
+                                    Text(
+                                        text = "¡Contraseña actualizada!",
+                                        color = VerdeClaro,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                    Text(
+                                        text = "Volviendo al inicio de sesión...",
+                                        color = TextoSecundario,
+                                        fontSize = 13.sp,
+                                    )
+                                }
+                            }
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
@@ -203,12 +232,21 @@ fun PantallaRecuperacion(navController: NavController) {
 
                     if (datos.errorGeneral != null) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = datos.errorGeneral,
-                            color = Rojo,
-                            fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = Rojo.copy(alpha = 0.12f),
+                                    shape = RoundedCornerShape(12.dp),
+                                )
+                                .padding(14.dp),
+                        ) {
+                            Text(
+                                text = datos.errorGeneral,
+                                color = Rojo,
+                                fontSize = 14.sp,
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
