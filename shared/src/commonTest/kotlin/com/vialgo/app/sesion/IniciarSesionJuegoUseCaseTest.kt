@@ -23,7 +23,7 @@ class IniciarSesionJuegoUseCaseTest {
 
     @Test
     fun `bloquea inicio cuando el usuario tiene 0 vidas`() = runTest {
-        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(cantidad = 0))
+        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(vidasActuales = 0))
 
         val resultado = casoDeUso.ejecutar(params)
 
@@ -34,7 +34,7 @@ class IniciarSesionJuegoUseCaseTest {
 
     @Test
     fun `permite inicio cuando el usuario tiene vidas disponibles`() = runTest {
-        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(cantidad = 3))
+        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(vidasActuales = 3))
         repoSesion.resultadoIniciarSesion = Resultado.Exito(sesionPrueba())
 
         val resultado = casoDeUso.ejecutar(params)
@@ -45,7 +45,7 @@ class IniciarSesionJuegoUseCaseTest {
 
     @Test
     fun `permite inicio cuando el usuario tiene exactamente 1 vida`() = runTest {
-        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(cantidad = 1))
+        repoGamificacion.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(vidasActuales = 1))
 
         val resultado = casoDeUso.ejecutar(params)
 

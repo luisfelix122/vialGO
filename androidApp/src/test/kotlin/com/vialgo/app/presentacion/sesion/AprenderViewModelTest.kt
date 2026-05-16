@@ -60,7 +60,7 @@ class AprenderViewModelTest {
     @Test
     fun `cargar contenido con 0 vidas refleja vidas en estado`() = runTest {
         val repoGami = FakeRepoGamificacionAndroid(
-            resultadoObtenerVidas = Resultado.Exito(vidaTestAndroid(cantidad = 0))
+            resultadoObtenerVidas = Resultado.Exito(vidaTestAndroid(vidasActuales = 0))
         )
         val vm = buildViewModel(repoGami = repoGami, scheduler = testScheduler)
 

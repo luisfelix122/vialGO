@@ -44,6 +44,11 @@ object ErrorMapeador {
         "HASH_ERROR" to "Error interno del servidor. Intentá de nuevo más tarde.",
         "DB_ERROR" to "Error interno del servidor. Intentá de nuevo más tarde.",
         "SIGNIN_ERROR" to "Tu cuenta se creó pero hubo un error al iniciar sesión. Intentá iniciar sesión manualmente.",
+
+        // Session import errors
+        "SESSION_IMPORT_FAILED" to "Error al establecer la sesión. Intentá iniciar sesión de nuevo.",
+        "RETRY_EXHAUSTED" to "Tu cuenta se creó pero no pudimos iniciar sesión automáticamente. Intentá iniciar sesión manualmente.",
+        "USER_PROFILE_NOT_FOUND" to "No se encontró tu perfil. Contactá soporte si el problema persiste.",
     )
 
     /**

@@ -49,6 +49,7 @@ fun OpcionPreguntaDto.aEntidad(): OpcionPregunta = OpcionPregunta(
     id = id,
     preguntaId = preguntaId,
     texto = texto,
+    imagenUrl = imagenUrl,
     esCorrecta = esCorrecta,
     orden = orden,
 )

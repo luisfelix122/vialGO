@@ -1,12 +1,15 @@
 package com.vialgo.app.dominio.entidades
 
+import kotlinx.datetime.Instant
+
 data class EstadisticasUsuario(
+    val id: String,
     val usuarioId: String,
-    val leccionesCompletadas: Int,
-    val sesionesTotales: Int,
-    val tiempoTotalSegundos: Int,
-    val puntajeTotalAcumulado: Int,
-    val rachaActual: Int,
-    val rachaMasLarga: Int,
-    val posicionRanking: Int?,
+    val rol: String,
+    val totalSesiones: Int,
+    val totalPreguntas: Int,
+    val totalCorrectas: Int,
+    val tiempoTotalMs: Long,
+    val vidasSalvadas: Int,
+    val actualizadoEn: Instant,
 )

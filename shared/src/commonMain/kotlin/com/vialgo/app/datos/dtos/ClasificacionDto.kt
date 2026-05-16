@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ClasificacionDto(
-    @SerialName("posicion") val posicion: Int,
+    @SerialName("id") val id: String,
     @SerialName("usuario_id") val usuarioId: String,
-    @SerialName("nombre_usuario") val nombreUsuario: String,
-    @SerialName("puntaje") val puntaje: Int,
-    @SerialName("nivel") val nivel: Int,
-    @SerialName("rol_usuario") val rolUsuario: String,
+    @SerialName("rol") val rol: String,
+    @SerialName("sesion_id") val sesionId: String,
+    @SerialName("reputacion_inicial") val reputacionInicial: Double,
+    @SerialName("completada_en") val completadaEn: String = "",
 )

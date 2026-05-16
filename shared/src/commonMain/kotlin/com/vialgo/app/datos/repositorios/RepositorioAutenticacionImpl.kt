@@ -13,7 +13,6 @@ import com.vialgo.app.dominio.entidades.Usuario
 import com.vialgo.app.dominio.repositorios.RepositorioAutenticacion
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.signInAnonymously
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.call.body
 import kotlinx.datetime.Instant
@@ -43,6 +42,14 @@ class RepositorioAutenticacionImpl(
                 return Resultado.Error(ErrorMapeador.traducir(errorMsg))
             }
             val authResponse = json.decodeFromString<AuthResponseDto>(cuerpo)
+            val sesion = authResponse.data?.session
+            if (sesion != null && sesion.accessToken.isNotBlank() && sesion.refreshToken.isNotBlank()) {
+                try {
+                    cliente.auth.importAuthToken(sesion.accessToken, sesion.refreshToken)
+                } catch (e: Exception) {
+                    return Resultado.Error(ErrorMapeador.traducir("SESSION_IMPORT_FAILED"), e)
+                }
+            }
             val usuario = authResponse.data?.user?.aEntidad()
                 ?: return Resultado.Error("Respuesta de servidor inválida")
             Resultado.Exito(usuario)
@@ -78,6 +85,14 @@ class RepositorioAutenticacionImpl(
                 return Resultado.Error(ErrorMapeador.traducir(errorMsg))
             }
             val authResponse = json.decodeFromString<AuthResponseDto>(cuerpoReg)
+            val sesion = authResponse.data?.session
+            if (sesion != null && sesion.accessToken.isNotBlank() && sesion.refreshToken.isNotBlank()) {
+                try {
+                    cliente.auth.importAuthToken(sesion.accessToken, sesion.refreshToken)
+                } catch (e: Exception) {
+                    return Resultado.Error(ErrorMapeador.traducir("SESSION_IMPORT_FAILED"), e)
+                }
+            }
             val usuario = authResponse.data?.user?.aEntidad()
                 ?: return Resultado.Error("Respuesta de servidor inválida")
             Resultado.Exito(usuario)
@@ -110,31 +125,28 @@ class RepositorioAutenticacionImpl(
         }
 
     override suspend fun continuarComoInvitado(): Resultado<Usuario> =
-        try {
-            cliente.auth.signInAnonymously()
-            val sesion = cliente.auth.currentSessionOrNull()
-            val usuarioInvitado = Usuario(
-                id = sesion?.user?.id ?: "invitado",
-                correo = "",
-                nombre = "Invitado",
-                rol = RolUsuario.INVITADO,
-                vidas = 0,
-                rachaActual = 0,
-                rachaMasLarga = 0,
-                puntosExperiencia = 0,
-                nivel = 0,
-                creadoEn = Instant.fromEpochMilliseconds(0),
-                actualizadoEn = Instant.fromEpochMilliseconds(0),
-                dni = "",
-                rolActivo = RolUsuario.INVITADO.name.lowercase(),
-                compromisoMinutos = 0,
-                tutorialCompletado = false,
-                debeCambiarPregunta = false,
-            )
-            Resultado.Exito(usuarioInvitado)
-        } catch (e: Exception) {
-            Resultado.Error(ErrorMapeador.traducir(e.message), e)
-        }
+        Resultado.Exito(USUARIO_INVITADO)
+
+    companion object {
+        val USUARIO_INVITADO = Usuario(
+            id = "invitado-local",
+            correo = "",
+            nombre = "Invitado",
+            rol = RolUsuario.INVITADO,
+            vidas = 0,
+            rachaActual = 0,
+            rachaMasLarga = 0,
+            puntosExperiencia = 0,
+            nivel = 0,
+            creadoEn = Instant.fromEpochMilliseconds(0),
+            actualizadoEn = Instant.fromEpochMilliseconds(0),
+            dni = "",
+            rolActivo = RolUsuario.INVITADO.name.lowercase(),
+            compromisoMinutos = 0,
+            tutorialCompletado = false,
+            debeCambiarPregunta = false,
+        )
+    }
 
     override suspend fun cerrarSesion(): Resultado<Unit> =
         try {

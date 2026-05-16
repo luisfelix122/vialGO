@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class VidaDto(
     @SerialName("id") val id: String,
     @SerialName("usuario_id") val usuarioId: String,
-    @SerialName("cantidad") val cantidad: Int,
-    @SerialName("proxima_recarga_en") val proximaRecargaEn: String?,
+    @SerialName("vidas_actuales") val vidasActuales: Int,
+    @SerialName("ultima_recarga") val ultimaRecarga: String = "",
+    @SerialName("actualizado_en") val actualizadoEn: String = "",
 )

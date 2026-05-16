@@ -155,14 +155,27 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  // --- Sign in and return session ---
-  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  // --- Sign in and return session (retry loop for auth propagation race) ---
+  const MAX_INTENTOS = 3;
+  const DEMORA_MS = 200;
+  let signInData: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>["data"] | null = null;
+  let signInError: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>["error"] | null = null;
+
+  for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+    const resultado = await supabase.auth.signInWithPassword({ email, password });
+    signInData = resultado.data;
+    signInError = resultado.error;
+    if (!signInError) break;
+    if (intento < MAX_INTENTOS) {
+      await new Promise((resolve) => setTimeout(resolve, DEMORA_MS));
+    }
+  }
 
   if (signInError) {
-    return jsonResponse({ error: "User created but sign-in failed", code: "SIGNIN_ERROR" }, 500);
+    return jsonResponse(
+      { error: "User created but sign-in failed after retries", code: "RETRY_EXHAUSTED" },
+      500,
+    );
   }
 
   return jsonResponse({

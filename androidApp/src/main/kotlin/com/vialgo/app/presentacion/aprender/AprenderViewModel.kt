@@ -65,7 +65,7 @@ class AprenderViewModel(
             }
 
             val vidas = when (vidasResult) {
-                is Resultado.Exito -> vidasResult.datos.cantidad
+                is Resultado.Exito -> vidasResult.datos.vidasActuales
                 else -> 5
             }
 

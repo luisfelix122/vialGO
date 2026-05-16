@@ -26,7 +26,6 @@ import com.vialgo.app.dominio.entidades.ProgresoLeccion
 import com.vialgo.app.dominio.entidades.RespuestaUsuario
 import com.vialgo.app.dominio.entidades.RolUsuario
 import com.vialgo.app.dominio.entidades.Sesion
-import com.vialgo.app.dominio.entidades.TipoPregunta
 import com.vialgo.app.dominio.entidades.Vida
 import com.vialgo.app.dominio.repositorios.RepositorioContenido
 import com.vialgo.app.dominio.repositorios.RepositorioGamificacion
@@ -68,7 +67,7 @@ class FakeRepoContenidoAndroid(
 
 class FakeRepoGamificacionAndroid(
     var resultadoObtenerVidas: Resultado<Vida> = Resultado.Exito(vidaTestAndroid()),
-    var resultadoConsumirVida: Resultado<Vida> = Resultado.Exito(vidaTestAndroid(cantidad = 4)),
+    var resultadoConsumirVida: Resultado<Vida> = Resultado.Exito(vidaTestAndroid(vidasActuales = 4)),
 ) : RepositorioGamificacion {
     override suspend fun obtenerVidas(usuarioId: String) = resultadoObtenerVidas
     override suspend fun consumirVida(usuarioId: String) = resultadoConsumirVida
@@ -103,22 +102,26 @@ fun respuestaTestAndroid(fueCorrecta: Boolean = true, xpObtenido: Int = 50) = Re
     xpObtenido = xpObtenido,
 )
 
-fun vidaTestAndroid(cantidad: Int = 5) = Vida(
+fun vidaTestAndroid(vidasActuales: Int = 5) = Vida(
     id = "vida-1",
     usuarioId = "usuario-123",
-    cantidad = cantidad,
-    proximaRecargaEn = null,
+    vidasActuales = vidasActuales,
+    ultimaRecarga = Instant.fromEpochMilliseconds(0),
+    actualizadoEn = Instant.fromEpochMilliseconds(0),
 )
 
 fun preguntasTestAndroid(cantidad: Int = 5): List<Pregunta> = (1..cantidad).map { i ->
     Pregunta(
         id = "pregunta-$i",
+        categoriaId = "categoria-1",
         leccionId = "leccion-1",
         enunciado = "Pregunta $i",
-        tipo = TipoPregunta.OPCION_MULTIPLE,
-        urlImagen = null,
-        urlVideo = null,
-        orden = i,
+        tipoMedio = "imagen",
+        urlMedio = "https://ejemplo.com/img$i.png",
+        duracionMedioSeg = null,
+        textoConsecuencia = "Consecuencia de pregunta $i",
+        esClasificacion = false,
+        estaActiva = true,
         opciones = listOf(
             OpcionPregunta(id = "opcion-correcta-$i", preguntaId = "pregunta-$i", texto = "Correcta", esCorrecta = true, orden = 1),
             OpcionPregunta(id = "opcion-incorrecta-$i", preguntaId = "pregunta-$i", texto = "Incorrecta", esCorrecta = false, orden = 2),

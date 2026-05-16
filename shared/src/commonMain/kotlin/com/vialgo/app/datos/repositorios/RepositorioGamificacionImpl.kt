@@ -9,15 +9,15 @@ import com.vialgo.app.dominio.entidades.Vida
 import com.vialgo.app.dominio.repositorios.RepositorioGamificacion
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.Json
 
 class RepositorioGamificacionImpl(
     private val cliente: SupabaseClient,
 ) : RepositorioGamificacion {
+
+    private val epoch = Instant.fromEpochMilliseconds(0)
 
     override suspend fun obtenerVidas(usuarioId: String): Resultado<Vida> = try {
         val respuesta = cliente.postgrest.rpc(
@@ -28,8 +28,9 @@ class RepositorioGamificacionImpl(
         val vida = Vida(
             id = usuarioId,
             usuarioId = usuarioId,
-            cantidad = vidasActuales,
-            proximaRecargaEn = null,
+            vidasActuales = vidasActuales,
+            ultimaRecarga = epoch,
+            actualizadoEn = epoch,
         )
         Resultado.Exito(vida)
     } catch (e: Exception) {

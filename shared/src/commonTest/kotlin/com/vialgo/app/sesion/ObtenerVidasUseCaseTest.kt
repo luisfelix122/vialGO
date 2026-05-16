@@ -15,24 +15,24 @@ class ObtenerVidasUseCaseTest {
 
     @Test
     fun `delega al repositorio y retorna vidas del usuario`() = runTest {
-        val vidaEsperada = vidaPrueba(cantidad = 5)
+        val vidaEsperada = vidaPrueba(vidasActuales = 5)
         repositorio.resultadoObtenerVidas = Resultado.Exito(vidaEsperada)
 
         val resultado = casoDeUso.ejecutar(ParamsObtenerVidas(usuarioId = "usuario-123"))
 
         assertIs<Resultado.Exito<*>>(resultado)
-        assertEquals(5, (resultado as Resultado.Exito).datos.cantidad)
+        assertEquals(5, (resultado as Resultado.Exito).datos.vidasActuales)
         assertEquals(1, repositorio.llamadasObtenerVidas)
     }
 
     @Test
     fun `retorna cero vidas cuando el usuario las agoto`() = runTest {
-        repositorio.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(cantidad = 0))
+        repositorio.resultadoObtenerVidas = Resultado.Exito(vidaPrueba(vidasActuales = 0))
 
         val resultado = casoDeUso.ejecutar(ParamsObtenerVidas(usuarioId = "usuario-123"))
 
         assertIs<Resultado.Exito<*>>(resultado)
-        assertEquals(0, (resultado as Resultado.Exito).datos.cantidad)
+        assertEquals(0, (resultado as Resultado.Exito).datos.vidasActuales)
         assertEquals(1, repositorio.llamadasObtenerVidas)
     }
 

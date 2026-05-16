@@ -23,6 +23,7 @@ data class OpcionPreguntaDto(
     @SerialName("id") val id: String,
     @SerialName("pregunta_id") val preguntaId: String,
     @SerialName("texto") val texto: String,
+    @SerialName("imagen_url") val imagenUrl: String? = null,
     @SerialName("es_correcta") val esCorrecta: Boolean,
     @SerialName("orden") val orden: Int,
 )

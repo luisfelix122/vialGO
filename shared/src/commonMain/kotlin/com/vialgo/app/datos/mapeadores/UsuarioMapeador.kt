@@ -2,6 +2,7 @@ package com.vialgo.app.datos.mapeadores
 
 import com.vialgo.app.datos.dtos.UsuarioAuthDto
 import com.vialgo.app.datos.dtos.UsuarioDto
+import com.vialgo.app.datos.dtos.UsuarioTablaDto
 import com.vialgo.app.dominio.entidades.RolUsuario
 import com.vialgo.app.dominio.entidades.Usuario
 import kotlinx.datetime.Instant
@@ -48,6 +49,29 @@ fun Usuario.aDto(): UsuarioDto = UsuarioDto(
     actualizadoEn = actualizadoEn.toString(),
     dni = dni,
     preguntaSeguridad = preguntaSeguridad,
+    rolActivo = rolActivo,
+    compromisoMinutos = compromisoMinutos,
+    tutorialCompletado = tutorialCompletado,
+    debeCambiarPregunta = debeCambiarPregunta,
+)
+
+/**
+ * Mapea una fila de la tabla `usuarios` al dominio.
+ * Los campos de gamificación no existen en esta tabla — se inicializan en cero.
+ */
+fun UsuarioTablaDto.aEntidad(): Usuario = Usuario(
+    id = id,
+    correo = "",
+    nombre = nombre,
+    rol = runCatching { rolStringAEntidad(rolActivo) }.getOrDefault(RolUsuario.CONDUCTOR),
+    vidas = 0,
+    rachaActual = 0,
+    rachaMasLarga = 0,
+    puntosExperiencia = 0,
+    nivel = 0,
+    creadoEn = if (fechaRegistro.isNotBlank()) Instant.parse(fechaRegistro) else Instant.fromEpochMilliseconds(0),
+    actualizadoEn = if (actualizadoEn.isNotBlank()) Instant.parse(actualizadoEn) else Instant.fromEpochMilliseconds(0),
+    dni = dni,
     rolActivo = rolActivo,
     compromisoMinutos = compromisoMinutos,
     tutorialCompletado = tutorialCompletado,

@@ -4,7 +4,6 @@ import com.vialgo.app.datos.dtos.BeneficioDto
 import com.vialgo.app.datos.dtos.ClasificacionDto
 import com.vialgo.app.datos.dtos.VidaDto
 import com.vialgo.app.datos.mapeadores.aEntidad
-import com.vialgo.app.dominio.entidades.RolUsuario
 import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,8 +16,9 @@ class GamificacionMapeadorTest {
     private val vidaDtoBase = VidaDto(
         id = "vida-001",
         usuarioId = "usuario-123",
-        cantidad = 5,
-        proximaRecargaEn = "2024-06-01T08:00:00Z",
+        vidasActuales = 5,
+        ultimaRecarga = "2024-06-01T08:00:00Z",
+        actualizadoEn = "2024-06-01T08:00:00Z",
     )
 
     @Test
@@ -27,24 +27,26 @@ class GamificacionMapeadorTest {
 
         assertEquals("vida-001", entidad.id)
         assertEquals("usuario-123", entidad.usuarioId)
-        assertEquals(5, entidad.cantidad)
-        assertEquals(Instant.parse("2024-06-01T08:00:00Z"), entidad.proximaRecargaEn)
+        assertEquals(5, entidad.vidasActuales)
+        assertEquals(Instant.parse("2024-06-01T08:00:00Z"), entidad.ultimaRecarga)
+        assertEquals(Instant.parse("2024-06-01T08:00:00Z"), entidad.actualizadoEn)
     }
 
     @Test
-    fun `VidaDto aEntidad con proximaRecargaEn null mapea a null`() {
-        val dto = vidaDtoBase.copy(proximaRecargaEn = null)
+    fun `VidaDto aEntidad con timestamps vacios usa epoch`() {
+        val dto = vidaDtoBase.copy(ultimaRecarga = "", actualizadoEn = "")
         val entidad = dto.aEntidad()
 
-        assertNull(entidad.proximaRecargaEn)
+        assertEquals(Instant.fromEpochMilliseconds(0), entidad.ultimaRecarga)
+        assertEquals(Instant.fromEpochMilliseconds(0), entidad.actualizadoEn)
     }
 
     @Test
-    fun `VidaDto aEntidad con cero vidas mapea cantidad correctamente`() {
-        val dto = vidaDtoBase.copy(cantidad = 0)
+    fun `VidaDto aEntidad con cero vidas mapea vidasActuales correctamente`() {
+        val dto = vidaDtoBase.copy(vidasActuales = 0)
         val entidad = dto.aEntidad()
 
-        assertEquals(0, entidad.cantidad)
+        assertEquals(0, entidad.vidasActuales)
     }
 
     // ---- BeneficioDto ----
@@ -53,10 +55,12 @@ class GamificacionMapeadorTest {
         id = "beneficio-001",
         titulo = "Descuento en peaje",
         descripcion = "Obtene un descuento del 10% en peajes de autopista",
-        urlImagen = "https://example.com/imagen.png",
-        puntosRequeridos = 500,
-        categoria = "transporte",
+        imagenUrl = "https://example.com/imagen.png",
+        rol = "conductor",
+        reputacionMinima = 75.0,
+        estaActivo = true,
         disponible = true,
+        orden = 1,
     )
 
     @Test
@@ -66,18 +70,20 @@ class GamificacionMapeadorTest {
         assertEquals("beneficio-001", entidad.id)
         assertEquals("Descuento en peaje", entidad.titulo)
         assertEquals("Obtene un descuento del 10% en peajes de autopista", entidad.descripcion)
-        assertEquals("https://example.com/imagen.png", entidad.urlImagen)
-        assertEquals(500, entidad.puntosRequeridos)
-        assertEquals("transporte", entidad.categoria)
+        assertEquals("https://example.com/imagen.png", entidad.imagenUrl)
+        assertEquals("conductor", entidad.rol)
+        assertEquals(75.0, entidad.reputacionMinima)
+        assertEquals(true, entidad.estaActivo)
         assertEquals(true, entidad.disponible)
+        assertEquals(1, entidad.orden)
     }
 
     @Test
-    fun `BeneficioDto aEntidad con urlImagen null mapea a null`() {
-        val dto = beneficioDtoBase.copy(urlImagen = null)
+    fun `BeneficioDto aEntidad con imagenUrl null mapea a null`() {
+        val dto = beneficioDtoBase.copy(imagenUrl = null)
         val entidad = dto.aEntidad()
 
-        assertNull(entidad.urlImagen)
+        assertNull(entidad.imagenUrl)
     }
 
     @Test
@@ -89,57 +95,49 @@ class GamificacionMapeadorTest {
     }
 
     @Test
-    fun `BeneficioDto aEntidad con cero puntos requeridos mapea correctamente`() {
-        val dto = beneficioDtoBase.copy(puntosRequeridos = 0)
+    fun `BeneficioDto aEntidad con reputacion minima cero mapea correctamente`() {
+        val dto = beneficioDtoBase.copy(reputacionMinima = 0.0)
         val entidad = dto.aEntidad()
 
-        assertEquals(0, entidad.puntosRequeridos)
+        assertEquals(0.0, entidad.reputacionMinima)
     }
 
     // ---- ClasificacionDto ----
 
     private val clasificacionDtoBase = ClasificacionDto(
-        posicion = 1,
+        id = "clas-001",
         usuarioId = "usuario-456",
-        nombreUsuario = "Maria Lopez",
-        puntaje = 1200,
-        nivel = 5,
-        rolUsuario = "conductor",
+        rol = "conductor",
+        sesionId = "sesion-789",
+        reputacionInicial = 85.5,
+        completadaEn = "2024-06-01T08:00:00Z",
     )
 
     @Test
     fun `ClasificacionDto aEntidad mapea todos los campos correctamente`() {
         val entidad = clasificacionDtoBase.aEntidad()
 
-        assertEquals(1, entidad.posicion)
+        assertEquals("clas-001", entidad.id)
         assertEquals("usuario-456", entidad.usuarioId)
-        assertEquals("Maria Lopez", entidad.nombreUsuario)
-        assertEquals(1200, entidad.puntaje)
-        assertEquals(5, entidad.nivel)
-        assertEquals(RolUsuario.CONDUCTOR, entidad.rolUsuario)
+        assertEquals("conductor", entidad.rol)
+        assertEquals("sesion-789", entidad.sesionId)
+        assertEquals(85.5, entidad.reputacionInicial)
+        assertEquals(Instant.parse("2024-06-01T08:00:00Z"), entidad.completadaEn)
+    }
+
+    @Test
+    fun `ClasificacionDto aEntidad con completadaEn vacio mapea a null`() {
+        val dto = clasificacionDtoBase.copy(completadaEn = "")
+        val entidad = dto.aEntidad()
+
+        assertNull(entidad.completadaEn)
     }
 
     @Test
     fun `ClasificacionDto aEntidad mapea rol peaton correctamente`() {
-        val dto = clasificacionDtoBase.copy(rolUsuario = "peaton")
+        val dto = clasificacionDtoBase.copy(rol = "peaton")
         val entidad = dto.aEntidad()
 
-        assertEquals(RolUsuario.PEATONAL, entidad.rolUsuario)
-    }
-
-    @Test
-    fun `ClasificacionDto aEntidad mapea rol ciclista correctamente`() {
-        val dto = clasificacionDtoBase.copy(rolUsuario = "ciclista")
-        val entidad = dto.aEntidad()
-
-        assertEquals(RolUsuario.CICLISTA, entidad.rolUsuario)
-    }
-
-    @Test
-    fun `ClasificacionDto aEntidad mapea posicion correctamente`() {
-        val dto = clasificacionDtoBase.copy(posicion = 10)
-        val entidad = dto.aEntidad()
-
-        assertEquals(10, entidad.posicion)
+        assertEquals("peaton", entidad.rol)
     }
 }

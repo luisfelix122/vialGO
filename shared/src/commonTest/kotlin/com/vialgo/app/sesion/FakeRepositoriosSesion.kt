@@ -101,7 +101,7 @@ class FakeRepositorioContenido : RepositorioContenido {
 class FakeRepositorioGamificacion : RepositorioGamificacion {
 
     var resultadoObtenerVidas: Resultado<Vida> = Resultado.Exito(vidaPrueba())
-    var resultadoConsumirVida: Resultado<Vida> = Resultado.Exito(vidaPrueba(cantidad = 4))
+    var resultadoConsumirVida: Resultado<Vida> = Resultado.Exito(vidaPrueba(vidasActuales = 4))
 
     var llamadasObtenerVidas = 0
     var llamadasConsumirVida = 0
@@ -160,11 +160,12 @@ fun respuestaPrueba(
     xpObtenido = xpObtenido,
 )
 
-fun vidaPrueba(cantidad: Int = 5) = Vida(
+fun vidaPrueba(vidasActuales: Int = 5) = Vida(
     id = "vida-1",
     usuarioId = "usuario-123",
-    cantidad = cantidad,
-    proximaRecargaEn = null,
+    vidasActuales = vidasActuales,
+    ultimaRecarga = Instant.fromEpochMilliseconds(0),
+    actualizadoEn = Instant.fromEpochMilliseconds(0),
 )
 
 fun preguntasPrueba(cantidad: Int = 5): List<Pregunta> = (1..cantidad).map { i ->

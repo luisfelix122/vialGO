@@ -1,9 +1,11 @@
 package com.vialgo.app.dominio.entidades
 
 data class ConfiguracionJuego(
-    val vidasMaximas: Int,
-    val tiempoRecargaVidaMinutos: Int,
-    val puntajePorRespuestaCorrecta: Int,
-    val bonificacionRacha: Int,
-    val nivelExperienciaPorLeccion: Int,
+    val id: String,
+    val diasParaMultiplicador: Int,
+    val valorMultiplicador: Double,
+    val horasRecargaVidas: Int,
+    val reputacionMinimaBeneficios: Double,
+    val decayPorcentajeDiario: Double,
+    val decayDiasGracia: Int,
 )

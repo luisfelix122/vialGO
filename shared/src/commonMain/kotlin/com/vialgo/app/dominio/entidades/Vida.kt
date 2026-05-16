@@ -5,6 +5,7 @@ import kotlinx.datetime.Instant
 data class Vida(
     val id: String,
     val usuarioId: String,
-    val cantidad: Int,
-    val proximaRecargaEn: Instant?,
+    val vidasActuales: Int,
+    val ultimaRecarga: Instant,
+    val actualizadoEn: Instant,
 )

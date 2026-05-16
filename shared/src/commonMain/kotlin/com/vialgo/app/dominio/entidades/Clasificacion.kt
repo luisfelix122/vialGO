@@ -1,10 +1,12 @@
 package com.vialgo.app.dominio.entidades
 
+import kotlinx.datetime.Instant
+
 data class Clasificacion(
-    val posicion: Int,
+    val id: String,
     val usuarioId: String,
-    val nombreUsuario: String,
-    val puntaje: Int,
-    val nivel: Int,
-    val rolUsuario: RolUsuario,
+    val rol: String,
+    val sesionId: String,
+    val reputacionInicial: Double,
+    val completadaEn: Instant?,
 )

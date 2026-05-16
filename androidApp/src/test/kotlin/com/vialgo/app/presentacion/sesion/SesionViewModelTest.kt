@@ -118,7 +118,7 @@ class SesionViewModelTest {
             resultadoIniciarSesion = Resultado.Error("No tienes vidas disponibles"),
         )
         val repoGami = FakeRepoGamificacionAndroid(
-            resultadoObtenerVidas = Resultado.Exito(vidaTestAndroid(cantidad = 0)),
+            resultadoObtenerVidas = Resultado.Exito(vidaTestAndroid(vidasActuales = 0)),
         )
         val vm = buildViewModel(
             repoSesion = repoSesion,

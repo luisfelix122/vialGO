@@ -20,7 +20,7 @@ class IniciarSesionJuegoUseCase(
 
     override suspend fun ejecutar(parametros: ParamsIniciarSesionJuego): Resultado<Sesion> {
         val vidasResult = repoGamificacion.obtenerVidas(parametros.usuarioId)
-        if (vidasResult is Resultado.Exito && vidasResult.datos.cantidad <= 0) {
+        if (vidasResult is Resultado.Exito && vidasResult.datos.vidasActuales <= 0) {
             return Resultado.Error("No tienes vidas disponibles")
         }
         return repoSesion.iniciarSesion(
