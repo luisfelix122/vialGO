@@ -167,15 +167,15 @@ export default function DashboardPage() {
             </div>
           </a>
           <a
-            href="/seed"
-            className="bg-surface border border-white/10 hover:border-vialgo-amber/50 rounded-xl p-5 flex items-center gap-4 transition-all duration-200 group"
+            href="/modulos"
+            className="bg-surface border border-white/10 hover:border-indigo-500/50 rounded-xl p-5 flex items-center gap-4 transition-all duration-200 group"
           >
-            <div className="w-12 h-12 bg-vialgo-amber/20 rounded-lg flex items-center justify-center text-2xl group-hover:bg-vialgo-amber/30 transition-colors">
-              🌱
+            <div className="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center text-2xl group-hover:bg-indigo-500/30 transition-colors">
+              🗂️
             </div>
             <div>
-              <p className="text-white font-medium">Insertar Datos de Prueba</p>
-              <p className="text-white/40 text-sm">5 preguntas con videos</p>
+              <p className="text-white font-medium">Nuevo Módulo</p>
+              <p className="text-white/40 text-sm">Organizar por temática</p>
             </div>
           </a>
         </div>

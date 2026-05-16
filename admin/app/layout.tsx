@@ -13,7 +13,6 @@ const navItems = [
   { href: '/categorias', label: 'Categorías', icon: '📁' },
   { href: '/lecciones', label: 'Lecciones', icon: '📚' },
   { href: '/preguntas', label: 'Preguntas', icon: '❓' },
-  { href: '/seed', label: 'Seed Data', icon: '🌱' },
 ]
 
 export default function RootLayout({
